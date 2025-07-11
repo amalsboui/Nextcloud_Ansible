@@ -1,0 +1,92 @@
+---
+# tasks file for nextcloud
+
+- name: Update apt cache and upgarde all packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install apache2
+  apt:
+    name: apache2
+    state: present
+
+- name: Ensure apache2 is enabled and started
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+
+- name: Install PHP and extensions
+  apt:
+    name: "{{ php_packages }}"
+    state: present
+
+- name: Install MariaDB server
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: yes
+
+- name: Ensure MariaDB is started and enabled
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Create nextcloud database
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    login_user: root
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Create nextcloud database user with privileges
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: "{{ db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_user: root
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Set permissions on nextcloud directory
+  file:
+    path: "{{ web_root }}"
+    mode: "0755"
+    recurse: yes
+
+- name: Extract nextcloud archive
+  unarchive:
+    src: /tmp/nextcloud.zip
+    dest: /var/www/html/
+    remote_src: yes
+  args:
+    creates: /var/www/html/nextcloud
+
+- name: Set ownership of nextcloud directory
+  file:
+    path: "{{ web_root }}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: Deploy Apache site configuration
+  template:
+    src: nextcloud.conf.j2
+    dest: "{{ apache_vhost_path }}"
+  notify: reload apache
+
+- name: Deploy Apache nextcloud apache site
+  command: a2ensite nextcloud.conf
+  args:
+    creates: /etc/apache2/sites-enabled/nextcloud.conf
+  notify: reload apache
+
+- name: Enable Apache rewrite module
+  command: a2enmod rewrite
+  args:
+    creates: /etc/apache2/mods-enabled/rewrite.load
+  notify: reload apache
+

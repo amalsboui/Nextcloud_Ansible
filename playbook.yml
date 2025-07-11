@@ -1,0 +1,8 @@
+---
+- name: Deploy Nextcloud
+  hosts: localhost
+  become: true
+
+  roles:
+    - nextcloud
+

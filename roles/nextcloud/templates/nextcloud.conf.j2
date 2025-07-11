@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot {{ web_root }}
+
+    <Directory {{ web_root }}>
+        Require all granted
+        Options FollowSymlinks MultiViews
+        AllowOverride All
+        <IfModule mod_dav.c>
+            Dav off
+        </IfModule>
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/nextcloud_error.log
+    CustomLog ${APACHE_LOG_DIR}/nextcloud_access.log combined
+</VirtualHost>
+

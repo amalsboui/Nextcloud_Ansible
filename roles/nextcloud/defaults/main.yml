@@ -1,0 +1,28 @@
+---
+# defaults file for nextcloud
+
+php_packages:
+  - php8.1
+  - php8.1-cli
+  - php8.1-common
+  - php8.1-imap
+  - php8.1-redis
+  - php8.1-snmp
+  - php8.1-xml
+  - php8.1-zip
+  - php8.1-mbstring
+  - php8.1-curl
+  - php8.1-gd
+  - php8.1-mysql
+
+db_name: nextcloud
+db_user: nextcloud
+db_password: "your-password"
+
+nextcloud_version: "31.0.6"
+nextcloud_url: "https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_version }}.zip"
+
+web_root: /var/www/html/nextcloud
+
+apache_vhost_path: /etc/apache2/sites-available/nextcloud.conf
+
