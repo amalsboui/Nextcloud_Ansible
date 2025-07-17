@@ -51,11 +51,11 @@
     login_user: root
     login_unix_socket: /run/mysqld/mysqld.sock
 
-- name: Set permissions on nextcloud directory
-  file:
-    path: "{{ web_root }}"
-    mode: "0755"
-    recurse: yes
+- name: Download nextcloud archive
+  get_url:
+    url: "{{ nextcloud_url }}"
+    dest: /tmp/nextcloud.zip
+    mode: '0644'
 
 - name: Extract nextcloud archive
   unarchive:
@@ -89,4 +89,5 @@
   args:
     creates: /etc/apache2/mods-enabled/rewrite.load
   notify: reload apache
+
 
